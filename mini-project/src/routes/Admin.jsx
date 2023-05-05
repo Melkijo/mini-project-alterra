@@ -5,7 +5,6 @@ export default function User() {
   return (
     <>
       <AdminSidebar />
-      <Outlet />
     </>
   );
 }
