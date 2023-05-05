@@ -1,6 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* body {
-    background-color: red;
-} */
+
+@layer base {
+    html {
+        font-family: 'poppins';
+    }
+
+    p {
+        font-size: 1rem;
+    }
+}

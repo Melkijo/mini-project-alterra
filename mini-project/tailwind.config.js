@@ -3,11 +3,11 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
-    'node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}'
+    'node_modules/preline/dist/*.js',
   ],
   theme: {
     extend: {},
   },
-  plugins: [require('./node_modules/flowbite/plugin')],
+  plugins: [require('preline/plugin')],
 }
 

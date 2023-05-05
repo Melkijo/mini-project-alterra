@@ -17,12 +17,24 @@ const GET_BEASISWA = gql`
 `;
 
 const INSERT_BEASISWA = gql`
-  mutation MyMutation($nama: String!) {
-    insert_beasiswa(objects: { nama: $nama }) {
+  mutation MyMutation(
+    $nama: String!
+    $img_url: String!
+    $reg_date: Date!
+    $deadline_data: Date!
+    $desc: String!
+  ) {
+    insert_beasiswa(
+      objects: {
+        nama: $nama
+        img_url: $img_url
+        reg_date: $reg_date
+        deadline_date: $deadline_date
+        desc: $desc
+      }
+    ) {
       returning {
-        nama
         id
-        created_at
       }
     }
   }
@@ -39,12 +51,10 @@ const UPDATE_BEASISWA = gql`
     }
   }
 `;
-export default function AdminPage() {
+export default function AdminUpload() {
   const { loading, error, data } = useSubscription(GET_BEASISWA);
   const [insertBeasiswa] = useMutation(INSERT_BEASISWA);
   const [updateBeasiswa] = useMutation(UPDATE_BEASISWA);
-
-  const [beasiswaList, setBeasiswaList] = useState([]);
 
   const {
     register,
@@ -75,35 +85,33 @@ export default function AdminPage() {
     }
   };
 
-  // useEffect(() => {
-  //   console.log(data);
-  // }, [data]);
-
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
   return (
     <>
-      <Link to="/">Home</Link>
-      <h1 className="text-3xl font-bold">hai Admin</h1>
-      <div style={{ display: "flex", gap: 50 }}>
+      {/* <Link to="/">Home</Link> */}
+      {/* <h1 className="text-3xl font-bold">hai Admin</h1> */}
+      {/* <div style={{ display: "flex", gap: 50 }}>
         {data.beasiswa.map((item) => (
           <div key={item.id}>
             <img src={item.img_url} alt="" width={200} />
             <h3>{item.nama}</h3>
           </div>
         ))}
-      </div>
-
-      <h1>FORM</h1>
+      </div> */}
+      <h1>Upload Beasiwa</h1> <br />
       <form onSubmit={handleSubmit(onSubmit)}>
+        <label htmlFor="">Nama Beasiswa</label>
         <input
           type="text"
           {...register("namaBeasiswa", { required: true })}
-          placeholder="Nama"
+          placeholder="Nama beasiswa"
         />
         <br />
         {errors.namaBeasiswa && <p>nama harus diisi</p>}
+        <label htmlFor="">Gambar Beasiswa</label>
+
         <input type="file" {...register("imgBeasiswa", { required: true })} />
         <br />
         {errors.imgBeasiswa && <p>gambar harus diisi</p>}

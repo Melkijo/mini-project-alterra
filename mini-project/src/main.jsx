@@ -15,9 +15,14 @@ import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import "./index.css";
 import User from "./routes/User.jsx";
-import AdminPage from "./pages/AdminPage.jsx";
+// import Admin from "./pages/AdminPage.jsx";
 import BeasiswaDetail from "./pages/BeasiswaDetailPage.jsx";
-
+import UserDetail from "./pages/UserDetail.jsx";
+import UserBeasiswa from "./pages/UserBeasiswa.jsx";
+import Admin from "./routes/Admin.jsx";
+import AdminBeasiswa from "./pages/AdminBeasiswa.jsx";
+import AdminDetail from "./pages/AdminDetail.jsx";
+import AdminUpload from "./pages/AdminUpload.jsx";
 const wsLink = new GraphQLWsLink(
   createClient({
     url: "ws://evolved-akita-43.hasura.app/v1/graphql",
@@ -89,10 +94,35 @@ const router = createBrowserRouter([
   {
     path: "/userPage",
     element: <User />,
+    children: [
+      {
+        index: true,
+        path: "beasiswa",
+        element: <UserBeasiswa />,
+      },
+      {
+        path: "detail",
+        element: <UserDetail />,
+      },
+    ],
   },
   {
     path: "/adminPage",
-    element: <AdminPage />,
+    element: <Admin />,
+    children: [
+      {
+        index: true,
+        element: <AdminBeasiswa />,
+      },
+      {
+        path: "upload",
+        element: <AdminUpload />,
+      },
+      {
+        path: "userList",
+        element: <AdminDetail />,
+      },
+    ],
   },
   {
     path: "/beasiswa/:id",

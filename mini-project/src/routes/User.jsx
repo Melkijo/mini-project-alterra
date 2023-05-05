@@ -4,8 +4,8 @@ import UserSidebar from "../components/UserSidebar";
 export default function User() {
   return (
     <>
-      <UserSidebar />
-      <div>
+      <div className="flex">
+        <UserSidebar />
         <Outlet />
       </div>
     </>
