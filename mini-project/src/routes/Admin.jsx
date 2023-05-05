@@ -4,7 +4,10 @@ import AdminSidebar from "../components/AdminSidebar";
 export default function User() {
   return (
     <>
-      <AdminSidebar />
+      <div className=" flex">
+        <AdminSidebar />
+        <Outlet />
+      </div>
     </>
   );
 }
