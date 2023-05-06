@@ -103,35 +103,34 @@ export default function AdminEditPage() {
   const onSubmit = async (data) => {
     const { id, nama, img, domisili, pendidikan, registrasi, deadline, desc } =
       data;
+
+    //   uploadBytes(imageRef, img[0]).then((snapshot) => {
+    //     getDownloadURL(snapshot.ref).then((url) => {
+    //       setImgUrl(url);
+    //     });
+    //   });
     const imageRef = ref(storage, `img/${img[0].name}`);
     const snapshot = await uploadBytes(imageRef, img[0]);
-    const url = await getDownloadURL(snapshot.ref);
-    setImgUrl(url);
-    // uploadBytes(imageRef, img[0]).then((snapshot) => {
-    //   getDownloadURL(snapshot.ref).then((url) => {
-    //     setImgUrl(url);
-    //   });
-    // });
-    // console.log(img);
-    console.log(imgUrl);
-    // const result = await updateBeasiswa({
-    //   variables: {
-    //     id: id,
-    //     nama,
-    //     img_url: imgUrl,
-    //     reg_date: registrasi,
-    //     deadline_date: deadline,
-    //     desc,
-    //     domisili,
-    //     pendidikan,
-    //   },
-    // });
+    const imgUrl = await getDownloadURL(snapshot.ref);
 
-    // if (result) {
-    //   alert("Beasiswa berhasil ditambah");
-    // } else {
-    //   alert("gagal");
-    // }
+    const result = await updateBeasiswa({
+      variables: {
+        id: id,
+        nama,
+        img_url: imgUrl,
+        reg_date: registrasi,
+        deadline_date: deadline,
+        desc,
+        domisili,
+        pendidikan,
+      },
+    });
+
+    if (result) {
+      alert("Beasiswa berhasil Diperbaharui");
+    } else {
+      alert("gagal");
+    }
   };
 
   //   const { state } = useLocation();
