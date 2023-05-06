@@ -104,11 +104,6 @@ export default function AdminEditPage() {
     const { id, nama, img, domisili, pendidikan, registrasi, deadline, desc } =
       data;
 
-    //   uploadBytes(imageRef, img[0]).then((snapshot) => {
-    //     getDownloadURL(snapshot.ref).then((url) => {
-    //       setImgUrl(url);
-    //     });
-    //   });
     const imageRef = ref(storage, `img/${img[0].name}`);
     const snapshot = await uploadBytes(imageRef, img[0]);
     const imgUrl = await getDownloadURL(snapshot.ref);
