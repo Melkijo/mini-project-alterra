@@ -1,26 +1,26 @@
 import { useAtom } from "jotai";
 import { Link } from "react-router-dom";
 import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
-import { userId } from "../components/Atoms";
-const GET_USERS = gql`
-  subscription MySubscription($id: uuid!) {
-    users_by_pk(id: $id) {
-      domisili
-      email
-      namaBelakang
-      namaDepan
-      password
-      pendidikan
-    }
-  }
-`;
+import { user } from "../components/Atoms";
+// const GET_USERS = gql`
+//   subscription MySubscription($id: uuid!) {
+//     users_by_pk(id: $id) {
+//       domisili
+//       email
+//       namaBelakang
+//       namaDepan
+//       password
+//       pendidikan
+//     }
+//   }
+// `;
 export default function UserPage() {
-  const [userIdx] = useAtom(userId);
-  const { loading, error, data } = useSubscription(GET_USERS, {
-    variables: { id: userIdx },
-  });
-  if (loading) return "Loading...";
-  if (error) return `Error! ${error.message}`;
+  const [userIdx] = useAtom(user);
+  // const { loading, error, data } = useSubscription(GET_USERS, {
+  //   variables: { id: userIdx },
+  // });
+  // if (loading) return "Loading...";
+  // if (error) return `Error! ${error.message}`;
   return (
     <>
       <div className="mt-10 px-10">
@@ -32,7 +32,7 @@ export default function UserPage() {
               <input
                 type="text"
                 className="py-3 px-4 block w-full border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
-                placeHolder={data.users_by_pk.namaDepan}
+                // placeHolder={data.users_by_pk.namaDepan}
                 readOnly
               ></input>
             </div>
@@ -41,7 +41,7 @@ export default function UserPage() {
               <input
                 type="text"
                 className="py-3 px-4 block w-full border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
-                placeHolder={data.users_by_pk.namaBelakang}
+                // placeHolder={data.users_by_pk.namaBelakang}
                 readOnly
               ></input>
             </div>
@@ -51,7 +51,7 @@ export default function UserPage() {
             <input
               type="text"
               className="py-3 px-4 block w-full border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
-              placeHolder={data.users_by_pk.email}
+              // placeHolder={data.users_by_pk.email}
               readOnly
             ></input>
           </div>
@@ -61,7 +61,7 @@ export default function UserPage() {
               <input
                 type="text"
                 className="py-3 px-4 block w-full border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
-                placeHolder={data.users_by_pk.domisili}
+                // placeHolder={data.users_by_pk.domisili}
                 readOnly
               ></input>
             </div>
@@ -70,7 +70,7 @@ export default function UserPage() {
               <input
                 type="text"
                 className="py-3 px-4 block w-full border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
-                placeHolder={data.users_by_pk.pendidikan}
+                // placeHolder={data.users_by_pk.pendidikan}
                 readOnly
               ></input>
             </div>
