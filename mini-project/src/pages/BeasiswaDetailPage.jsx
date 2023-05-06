@@ -11,6 +11,7 @@ const GET_BEASISWA = gql`
       img_url
       id
       created_at
+      desc
     }
   }
 `;
@@ -30,17 +31,15 @@ export default function BeasiswaDetail() {
   return (
     <>
       <Navbar />
-      <div className="max-w-[90rem] mx-auto px-4 ">
-        <img src={data.beasiswa_by_pk.img_url} className="" alt="" />
+      <div className="  mx-96  my-10 ">
         <h1 className="text-3xl font-bold mb-5">{data.beasiswa_by_pk.nama}</h1>
-        <p>
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Iusto
-          aperiam odit repudiandae quas a. Fugit voluptates, error tempora odio,
-          at obcaecati, qui ut exercitationem consequatur nemo mollitia maxime.
-          Cupiditate consequatur eum amet eveniet incidunt quam minima, alias
-          quae error maxime quo fuga iure consequuntur tempora modi? Neque
-          officiis ratione nisi?
-        </p>
+
+        <img
+          src={data.beasiswa_by_pk.img_url}
+          className=" w-1/2 mx-auto h-auto"
+          alt=""
+        />
+        <p dangerouslySetInnerHTML={{ __html: data.beasiswa_by_pk.desc }}></p>
       </div>
 
       <Footer />

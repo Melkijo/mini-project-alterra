@@ -9,6 +9,8 @@ const GET_BEASISWA = gql`
       id
       created_at
       img_url
+      reg_date
+      deadline_date
     }
   }
 `;
@@ -41,7 +43,7 @@ export default function BeasiswaPage() {
               type="text"
               id="hs-search-box-with-loading-5"
               name="hs-search-box-with-loading-5"
-              className="py-3 px-4 pl-11 block w-full border-gray-200 shadow-sm rounded-l-md text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 "
+              className="py-3 px-4 pl-11 block w-full border border-gray-300 shadow-sm rounded-l-md text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 "
               placeholder="Input search"
             />
             <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
@@ -60,18 +62,11 @@ export default function BeasiswaPage() {
               type="button"
               className="py-3 px-4 inline-flex flex-shrink-0 justify-center items-center gap-2 rounded-r-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
             >
-              {/* <span
-                className="animate-spin inline-block w-4 h-4 border-[3px] border-current border-t-transparent text-white rounded-full"
-                role="status"
-                aria-label="loading"
-              >
-                <span className="sr-only">Loading...</span>
-              </span> */}
               Search
             </button>
           </div>
         </div>
-        <div className="flex flex-wrap gap-10 justify-center md:justify-between">
+        <div className="grid grid-cols-1 gap-10 justify-center md:grid-cols-4 sm:grid-cols-2">
           {data.beasiswa.map((item, index) => (
             <Link
               key={item.id}
@@ -81,7 +76,7 @@ export default function BeasiswaPage() {
             >
               <div className=" bg-white border shadow-md rounded-xl   ">
                 <img
-                  className=" h-auto mx-auto  rounded-t-xl md:h-64"
+                  className=" h-auto   rounded-t-xl md:h-64 object-cover"
                   src={item.img_url}
                   alt="Image Description"
                 />
@@ -92,11 +87,11 @@ export default function BeasiswaPage() {
                   <div>
                     <div className="flex items-center  justify-between">
                       <p>Registrasi</p>
-                      {/* <p className=" ">{item.registrasi}</p> */}
+                      <p className=" ">{item.reg_date}</p>
                     </div>
                     <div className="flex items-center  justify-between">
                       <p>Tutup</p>
-                      {/* <p className=" ">{item.tutup}</p> */}
+                      <p className=" ">{item.deadline_date}</p>
                     </div>
                   </div>
                 </div>

@@ -4,7 +4,9 @@ import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
 import { storage } from "../components/Firebase";
-
+import axios from "axios";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 const GET_BEASISWA = gql`
   subscription MySubscription {
     beasiswa {
@@ -20,9 +22,11 @@ const INSERT_BEASISWA = gql`
   mutation MyMutation(
     $nama: String!
     $img_url: String!
-    $reg_date: Date!
-    $deadline_data: Date!
+    $reg_date: date!
+    $deadline_date: date!
     $desc: String!
+    $domisili: String!
+    $pendidikan: String!
   ) {
     insert_beasiswa(
       objects: {
@@ -31,6 +35,8 @@ const INSERT_BEASISWA = gql`
         reg_date: $reg_date
         deadline_date: $deadline_date
         desc: $desc
+        domisili: $domisili
+        pendidikan: $pendidikan
       }
     ) {
       returning {
@@ -55,19 +61,56 @@ export default function AdminUpload() {
   const { loading, error, data } = useSubscription(GET_BEASISWA);
   const [insertBeasiswa] = useMutation(INSERT_BEASISWA);
   const [updateBeasiswa] = useMutation(UPDATE_BEASISWA);
+  const [provinces, setProvinces] = useState([]);
+  const pendidikanList = ["umum", "smp", "sma/smk", "S1", "S2"];
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async (data) => {
-    const { namaBeasiswa, imgBeasiswa } = data;
-    const result = await insertBeasiswa({ variables: { nama: namaBeasiswa } });
+  let provincesApi = "https://dev.farizdotid.com/api/daerahindonesia/provinsi";
 
-    const imageRef = ref(storage, `img/${imgBeasiswa[0].name}`);
-    uploadBytes(imageRef, imgBeasiswa[0]).then((snapshot) => {
+  useEffect(() => {
+    axios({
+      method: "get",
+      url: provincesApi,
+    })
+      .then((provinces) => {
+        setProvinces(provinces.data);
+      })
+
+      .catch((error) => console.error(error));
+  }, []);
+
+  useEffect(() => {
+    register("desc", { required: true });
+  }, [register]);
+
+  const onDescChange = (e) => {
+    setValue("desc", e);
+  };
+
+  const onSubmit = async (data) => {
+    const { nama, img, domisili, pendidikan, registrasi, deadline, desc } =
+      data;
+    const result = await insertBeasiswa({
+      variables: {
+        nama,
+        img_url: "temp",
+        reg_date: registrasi,
+        deadline_date: deadline,
+        desc,
+        domisili,
+        pendidikan,
+      },
+    });
+
+    const imageRef = ref(storage, `img/${img[0].name}`);
+    uploadBytes(imageRef, img[0]).then((snapshot) => {
       getDownloadURL(snapshot.ref).then((url) => {
         updateBeasiswa({
           variables: {
@@ -84,40 +127,137 @@ export default function AdminUpload() {
       alert("gagal");
     }
   };
+  const descContent = watch("desc");
 
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
   return (
     <>
-      {/* <Link to="/">Home</Link> */}
-      {/* <h1 className="text-3xl font-bold">hai Admin</h1> */}
-      {/* <div style={{ display: "flex", gap: 50 }}>
-        {data.beasiswa.map((item) => (
-          <div key={item.id}>
-            <img src={item.img_url} alt="" width={200} />
-            <h3>{item.nama}</h3>
+      <div className=" my-10 ms-5">
+        <h1 className=" text-3xl font-bold">Upload Beasiwa</h1> <br />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex gap-5">
+            <div>
+              <label
+                htmlFor="input-label"
+                className="block text-medium font-medium mb-2 mt-4"
+              >
+                Nama beasiswa
+              </label>
+              <input
+                type="text"
+                id="input-label"
+                {...register("nama", { required: true })}
+                className="py-3 px-4 block w-full border border-gray-200 rounded-md text-medium focus:border-blue-500 focus:ring-blue-500  "
+                placeholder="nama beasiswa"
+              />
+              {errors.nama && <p>harus diisi</p>}
+              <label
+                htmlFor="input-label"
+                className="block text-medium font-medium mb-2 mt-5"
+              >
+                Gambar beasiswa
+              </label>
+              <label htmlFor="file-input" className="sr-only">
+                Choose file
+              </label>
+              <input
+                type="file"
+                name="file-input"
+                id="file-input"
+                className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 file:bg-transparent file:border-0 file:bg-gray-200 file:mr-4 file:py-3 file:px-4"
+                {...register("img", { required: true })}
+              />
+              {errors.img && <p>gambar harus diisi</p>}
+
+              <div className="flex gap-7 mt-5">
+                <div>
+                  <label className="block text-medium font-medium mb-2 ">
+                    Domisili
+                  </label>
+                  <select
+                    {...register("domisili", { required: true })}
+                    className="py-3 px-4 block w-full border border-gray-200 rounded-md text-medium focus:border-blue-500 focus:ring-blue-500 "
+                  >
+                    <option value="semua">semua</option>
+                    {provinces.provinsi &&
+                      provinces.provinsi.map((item, index) => (
+                        <option value={item.nama} key={index}>
+                          {item.nama}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div>
+                  <label
+                    htmlFor="input-label"
+                    className="block text-medium font-medium mb-2 "
+                  >
+                    Pendidikan
+                  </label>
+                  <select
+                    {...register("pendidikan", { required: true })}
+                    className="py-3 px-4 block w-full border border-gray-200 rounded-md text-medium focus:border-blue-500 focus:ring-blue-500 "
+                  >
+                    {pendidikanList.map((item, index) => (
+                      <option value={item} key={index}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-7 mt-5 ">
+                <div>
+                  <label className="block text-medium font-medium mb-2 ">
+                    Registrasi
+                  </label>
+                  <input
+                    type="date"
+                    className="py-3 px-4 block w-full border border-gray-200 rounded-md text-medium focus:border-blue-500 focus:ring-blue-500 "
+                    {...register("registrasi", { required: true })}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="input-label"
+                    className="block text-medium font-medium mb-2 "
+                  >
+                    Deadline
+                  </label>
+                  <input
+                    type="date"
+                    className="py-3 px-4 block w-full border border-gray-200 rounded-md text-medium focus:border-blue-500 focus:ring-blue-500 "
+                    {...register("deadline", { required: true })}
+                  />
+                </div>
+              </div>
+            </div>
+            <div>
+              <label
+                htmlFor="input-label"
+                className="block text-medium font-medium mb-2 mt-5 "
+              >
+                Description
+              </label>
+              <ReactQuill
+                value={descContent}
+                onChange={onDescChange}
+                className="w-[750px] h-[300px]"
+              />
+            </div>
           </div>
-        ))}
-      </div> */}
-      <h1>Upload Beasiwa</h1> <br />
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <label htmlFor="">Nama Beasiswa</label>
-        <input
-          type="text"
-          {...register("namaBeasiswa", { required: true })}
-          placeholder="Nama beasiswa"
-        />
-        <br />
-        {errors.namaBeasiswa && <p>nama harus diisi</p>}
-        <label htmlFor="">Gambar Beasiswa</label>
 
-        <input type="file" {...register("imgBeasiswa", { required: true })} />
-        <br />
-        {errors.imgBeasiswa && <p>gambar harus diisi</p>}
-
-        <input type="submit" value="Tambah" />
-      </form>
+          <button
+            type="submit"
+            className=" my-5 py-3 px-5 inline-flex justify-center items-center  rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm"
+          >
+            upload beasiswa
+          </button>
+        </form>
+      </div>
     </>
   );
 }

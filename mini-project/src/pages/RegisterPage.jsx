@@ -36,7 +36,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [provinces, setProvinces] = useState([]);
 
-  const pendidikanList = ["umum", "smp", "sma", "smk", "s1", "s2"];
+  const pendidikanList = ["umum", "smp", "sma/smk", "S1", "S2"];
 
   const onSubmit = async (data) => {
     const { namaDepan, namaBelakang, email, password, domisili, pendidikan } =

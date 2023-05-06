@@ -1,8 +1,20 @@
-// import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 // import { textAtom } from "../components/Atoms";
 // import { useAtom } from "jotai";
-// import Footer from "../components/Footer";
+import { gql, useQuery } from "@apollo/client";
 
+const GET_BEASISWA = gql`
+  query GET_BEASISWA {
+    beasiswa {
+      nama
+      id
+      created_at
+      img_url
+      reg_date
+      deadline_date
+    }
+  }
+`;
 export default function LandingPage() {
   // const [userName] = useAtom(textAtom);
   const caraKerja = [
@@ -22,27 +34,9 @@ export default function LandingPage() {
       img: "https://firebasestorage.googleapis.com/v0/b/beasiswakita-3e322.appspot.com/o/utama%2Fkerja3.svg?alt=media&token=34fcfa5d-0bd1-4c68-bdc7-5528e42d2eb7",
     },
   ];
-
-  const beasiswa = [
-    {
-      title: "Beasiswa FRANCE EXCELLENCE",
-      registrasi: "01 Apr 2022",
-      tutup: "01 Apr 2022",
-      img: "https://firebasestorage.googleapis.com/v0/b/beasiswakita-3e322.appspot.com/o/img%2FBEASISWA-BRI.jpg?alt=media&token=6a4c5aad-cda1-45ad-9cd9-0fcffbd90a6e",
-    },
-    {
-      title: "Beasiswa FRANCE EXCELLENCE",
-      registrasi: "01 Apr 2022",
-      tutup: "01 Apr 2022",
-      img: "https://firebasestorage.googleapis.com/v0/b/beasiswakita-3e322.appspot.com/o/img%2FBEASISWA-BRI.jpg?alt=media&token=6a4c5aad-cda1-45ad-9cd9-0fcffbd90a6e",
-    },
-    {
-      title: "Beasiswa FRANCE EXCELLENCE",
-      registrasi: "01 Apr 2022",
-      tutup: "01 Apr 2022",
-      img: "https://firebasestorage.googleapis.com/v0/b/beasiswakita-3e322.appspot.com/o/img%2FBEASISWA-BRI.jpg?alt=media&token=6a4c5aad-cda1-45ad-9cd9-0fcffbd90a6e",
-    },
-  ];
+  const { loading, error, data } = useQuery(GET_BEASISWA);
+  if (loading) return "Loading...";
+  if (error) return `Error! ${error.message}`;
   return (
     // <div className="max-w-[90rem] w-full mx-auto px-4">
     <div>
@@ -56,19 +50,23 @@ export default function LandingPage() {
             Masa Depan Gemilang, Temukan Berbagai Informasi Beasiswa Terlengkap
             dan Akurat Hanya di Sini!"
           </p>
-          <button
-            type="button"
-            className="mr-5 py-3 px-5 inline-flex justify-center items-center  rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm"
-          >
-            Daftar
-          </button>
-          <button
-            type="button"
-            className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 ring-offset-white focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm"
-          >
-            Jelajahi
-            <i className="fa-solid fa-arrow-right"></i>
-          </button>
+          <Link to={"/daftar"}>
+            <button
+              type="button"
+              className="mr-5 py-3 px-5 inline-flex justify-center items-center  rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm"
+            >
+              Daftar
+            </button>
+          </Link>
+          <a href="#kerja">
+            <button
+              type="button"
+              className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 ring-offset-white focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm"
+            >
+              Jelajahi
+              <i className="fa-solid fa-arrow-right"></i>
+            </button>
+          </a>
         </div>
         <div className="w-full mx-2">
           <img
@@ -84,7 +82,10 @@ export default function LandingPage() {
           Cara Kerja Kami
         </h3>
 
-        <div className="flex gap-10 flex-wrap justify-center text-center ">
+        <div
+          id="kerja"
+          className="flex gap-10 flex-wrap justify-center text-center "
+        >
           {caraKerja.map((item, index) => (
             <div
               key={index}
@@ -126,41 +127,47 @@ export default function LandingPage() {
           Informasi Beasiswa Terbaru
         </h3>
         <div className="flex  gap-20 mb-5  items-center justify-center flex-col sm:flex-row">
-          {beasiswa.map((item, index) => (
-            <div
-              key={index}
-              className="flex flex-col bg-white border shadow-md rounded-xl  w-11/12 sm:w-full  "
+          {data.beasiswa.slice(0, 3).map((item, index) => (
+            <Link
+              key={item.id}
+              to={`/beasiswa/${item.id}`}
+              state={{ data: item }}
+              className=" w-full md:w-80"
             >
-              <img
-                className="w-full  h-auto rounded-t-xl"
-                src={item.img}
-                alt="Image Description"
-              />
-              <div className="p-4 md:p-5">
-                <h3 className="text-lg font-bold text-gray-800 ">
-                  {item.title}
-                </h3>
-                <div>
-                  <div className="flex items-center  justify-between">
-                    <p>Registrasi</p>
-                    <p className=" ">{item.registrasi}</p>
-                  </div>
-                  <div className="flex items-center  justify-between">
-                    <p>Tutup</p>
-                    <p className=" ">{item.tutup}</p>
+              <div className=" bg-white border shadow-md rounded-xl   ">
+                <img
+                  className=" h-auto   rounded-t-xl md:h-64 object-cover"
+                  src={item.img_url}
+                  alt="Image Description"
+                />
+                <div className="p-4 md:p-5">
+                  <h3 className="text-lg font-bold text-gray-800 ">
+                    {item.nama}
+                  </h3>
+                  <div>
+                    <div className="flex items-center  justify-between">
+                      <p>Registrasi</p>
+                      <p className=" ">{item.reg_date}</p>
+                    </div>
+                    <div className="flex items-center  justify-between">
+                      <p>Tutup</p>
+                      <p className=" ">{item.deadline_date}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
         <div className="text-center">
-          <button
-            type="button"
-            className="py-[.688rem] px-4 inline-flex  rounded-md border-2 border-gray-200 font-semibold text-blue-500 hover:text-white hover:bg-blue-500 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm "
-          >
-            Lebih Banyak
-          </button>
+          <Link to={"/beasiswa"}>
+            <button
+              type="button"
+              className="py-[.688rem] px-4 inline-flex  rounded-md border-2 border-gray-200 font-semibold text-blue-500 hover:text-white hover:bg-blue-500 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm "
+            >
+              Lebih Banyak
+            </button>
+          </Link>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { gql, useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 import { useAtom } from "jotai";
-import { userId } from "../components/Atoms";
+import { user } from "../components/Atoms";
 import Swal from "sweetalert2";
 const GET_USERS = gql`
   query MyQuery {
@@ -11,6 +11,8 @@ const GET_USERS = gql`
       id
       email
       password
+      domisili
+      pendidikan
     }
   }
 `;
@@ -22,7 +24,7 @@ const admin = {
 
 export default function LoginPage() {
   const { loading, error, data } = useQuery(GET_USERS);
-  const [userIdx, setUserIdx] = useAtom(userId);
+  const [userx, setUser] = useAtom(user);
   const navigate = useNavigate();
 
   const {
@@ -38,7 +40,7 @@ export default function LoginPage() {
     } else {
       const match = data.users.find((user) => {
         if (user.email === input.email && user.password === input.password) {
-          setUserIdx(user.id);
+          setUser(user);
           return true;
         }
       });
@@ -123,7 +125,7 @@ export default function LoginPage() {
           <img
             src="https://firebasestorage.googleapis.com/v0/b/beasiswakita-3e322.appspot.com/o/utama%2Flogin.jpg?alt=media&token=a4603db9-b9b6-45ec-9a40-12affe5eb243"
             alt=""
-            className=" h-screen  object-cover "
+            className=" h-screen object-cover "
           />
         </div>
       </div>
