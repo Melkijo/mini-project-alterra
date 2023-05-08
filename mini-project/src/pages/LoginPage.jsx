@@ -52,7 +52,6 @@ export default function LoginPage() {
 
     // set the user state
     setAuthState({ user: userx, token: tokenx });
-    // console.log(JSON.parse(localStorage.getItem("userData")));
   }
   const onSubmit = (input) => {
     if (input.email == admin.email && input.password === admin.password) {
