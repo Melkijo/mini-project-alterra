@@ -28,8 +28,7 @@ const wsLink = new GraphQLWsLink(
     url: "ws://evolved-akita-43.hasura.app/v1/graphql",
     connectionParams: {
       headers: {
-        "x-hasura-admin-secret":
-          "zMtgC7OoLa1X4PlfLtnPwBhtRlLUyWpUNWdyVZJvoH4wbZGHW6gpAjug68Es4FHB",
+        "x-hasura-admin-secret": import.meta.env.VITE_HASURA_ADMIN_SECRET,
       },
     },
   })
@@ -37,8 +36,7 @@ const wsLink = new GraphQLWsLink(
 const httpLink = new HttpLink({
   uri: "https://evolved-akita-43.hasura.app/v1/graphql",
   headers: {
-    "x-hasura-admin-secret":
-      "zMtgC7OoLa1X4PlfLtnPwBhtRlLUyWpUNWdyVZJvoH4wbZGHW6gpAjug68Es4FHB",
+    "x-hasura-admin-secret": import.meta.env.VITE_HASURA_ADMIN_SECRET,
   },
 });
 
@@ -86,22 +84,29 @@ const router = createBrowserRouter([
   {
     path: "/masuk",
     element: <LoginPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/daftar",
     element: <RegisterPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/userPage",
     element: <User />,
     children: [
       {
-        index: true,
-        element: <UserBeasiswa />,
-      },
-      {
-        path: "detail",
-        element: <UserDetail />,
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            index: true,
+            element: <UserBeasiswa />,
+          },
+          {
+            path: "detail",
+            element: <UserDetail />,
+          },
+        ],
       },
     ],
   },
@@ -110,26 +115,29 @@ const router = createBrowserRouter([
     element: <Admin />,
     children: [
       {
-        index: true,
-        element: <AdminBeasiswa />,
-      },
-      {
-        path: "upload",
-        element: <AdminUpload />,
-      },
-      {
-        path: "edit/:id",
-        element: <AdminEditPage />,
-      },
-      {
-        path: "userList",
-        element: <AdminUsers />,
+        errorElement: <ErrorPage />,
+        children: [
+          { index: true, element: <AdminBeasiswa /> },
+          {
+            path: "upload",
+            element: <AdminUpload />,
+          },
+          {
+            path: "edit/:id",
+            element: <AdminEditPage />,
+          },
+          {
+            path: "userList",
+            element: <AdminUsers />,
+          },
+        ],
       },
     ],
   },
   {
     path: "/beasiswa/:id",
     element: <BeasiswaDetail />,
+    errorElement: <ErrorPage />,
   },
 ]);
 ReactDOM.createRoot(document.getElementById("root")).render(

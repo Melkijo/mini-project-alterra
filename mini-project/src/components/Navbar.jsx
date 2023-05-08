@@ -1,5 +1,32 @@
 import { Link } from "react-router-dom";
+import { authAtom } from "./Atoms";
+import { useAtom } from "jotai";
+import { Navigate } from "react-router-dom";
+import cookies from "js-cookie";
+
 export default function Navbar() {
+  const [user, setUser] = useAtom(authAtom);
+  console.log(user);
+  // const [usersDatax] = useAtom(usersData);
+
+  // usersDatax.find((userFind) => {
+  //   if (user.id === userFind.id) {
+  //     setUser({ user: userFind });
+  //   }
+  // });
+
+  // console.log(usersDatax);
+  // console.log(user);
+  // useEffect(() => {
+  //   setUser({ user: { tes: "dsf" }, token: "asdfa" });
+  // }, []);
+
+  const handleLogout = () => {
+    setUser({ user: null, token: "" });
+    cookies.remove("auth_token");
+    localStorage.clear();
+    Navigate("/");
+  };
   return (
     <header className="drop-shadow-xl flex flex-wrap sm:justify-start sm:flex-nowrap z-50 w-full bg-white text-sm py-4">
       <nav
@@ -13,7 +40,7 @@ export default function Navbar() {
           <div className="sm:hidden">
             <button
               type="button"
-              className="hs-collapse-toggle p-2 inline-flex justify-center items-center gap-2 rounded-md border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:focus:ring-offset-gray-800"
+              className="hs-collapse-toggle p-2 inline-flex justify-center items-center gap-2 rounded-md border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm "
               data-hs-collapse="#navbar-collapse-with-animation"
               aria-controls="navbar-collapse-with-animation"
               aria-label="Toggle navigation"
@@ -46,43 +73,86 @@ export default function Navbar() {
           id="navbar-collapse-with-animation"
           className=" hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow sm:block"
         >
-          <div className="flex    gap-5 mt-5 sm:flex-row sm:items-center sm:justify-end sm:mt-0 sm:pl-5">
-            <div className="mx-auto flex   gap-16">
+          <div className="flex  flex-col  gap-5 mt-5 sm:flex-row sm:items-center sm:justify-end sm:mt-0 sm:pl-5">
+            <div className="mx-auto flex   gap-16 flex-col   sm:flex-row">
               <Link
-                className="font-normal text-lg  hover:text-gray-400  dark:hover:text-gray-500"
+                className="font-normal text-lg  hover:text-gray-400  "
                 to={"/"}
                 aria-current="page"
               >
                 Utama
               </Link>
               <Link
-                className="font-normal text-lg  hover:text-gray-400  dark:hover:text-gray-500"
+                className="font-normal text-lg  hover:text-gray-400  "
                 to={"/beasiswa"}
               >
                 Beasiswa
               </Link>
               <Link
-                className="font-normal text-lg  hover:text-gray-400  dark:hover:text-gray-500"
+                className="font-normal text-lg  hover:text-gray-400  "
                 to={"/tentang"}
               >
                 Tentang
               </Link>
             </div>
+            {user.user ? (
+              <div>
+                <div class="hs-dropdown [--strategy:static] sm:[--strategy:fixed] [--adaptive:none]">
+                  <button
+                    id="hs-mega-menu-basic-dr"
+                    type="button"
+                    className="flex items-center w-full text-gray-600 hover:text-gray-400 font-medium "
+                  >
+                    <span class="inline-flex items-center justify-center h-[2.375rem] w-[2.375rem] rounded-full bg-blue-500">
+                      <span className="font-medium text-white leading-none">
+                        {user.user.namaDepan.slice(0, 1).toUpperCase()}
+                        {user.user.namaBelakang.slice(0, 1).toUpperCase()}
+                      </span>
+                    </span>
+                  </button>
+                  <div className="hs-dropdown-menu transition-[opacity,margin] duration-[0.1ms] sm:duration-[150ms] hs-dropdown-open:opacity-100 opacity-0 sm:w-48 z-10 bg-white sm:shadow-md rounded-lg p-2  before:absolute top-full sm:border before:-top-5 before:left-0 before:w-full before:h-5 hidden">
+                    {user.user.namaDepan === "admin" ? (
+                      <Link
+                        className="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 "
+                        to={"/adminPage"}
+                      >
+                        Dashboard
+                      </Link>
+                    ) : (
+                      <Link
+                        className="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 "
+                        to={"/userPage"}
+                      >
+                        Dashboard
+                      </Link>
+                    )}
 
-            <div className="flex gap-7">
-              <Link
-                className="font-semibold text-lg  hover:text-gray-400  dark:hover:text-gray-500"
-                to={"/masuk"}
-              >
-                Masuk
-              </Link>
-              <Link
-                className="font-semibold text-lg  hover:text-gray-400  dark:hover:text-gray-500"
-                to={"/daftar"}
-              >
-                Daftar
-              </Link>
-            </div>
+                    <Link
+                      className="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 "
+                      onClick={() => handleLogout()}
+                    >
+                      Logout
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-7">
+                <Link
+                  className="font-semibold text-lg  hover:text-gray-400  dark:hover:text-gray-500"
+                  to={"/masuk"}
+                >
+                  Masuk
+                </Link>
+                <div className="font-semibold text-lg">|</div>
+                <Link
+                  className="font-semibold text-lg  hover:text-gray-400  dark:hover:text-gray-500"
+                  to={"/daftar"}
+                >
+                  Daftar
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </nav>

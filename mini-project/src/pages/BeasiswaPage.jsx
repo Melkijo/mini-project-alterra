@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
+import { useState } from "react";
 
 const GET_BEASISWA = gql`
   query GET_BEASISWA {
@@ -16,10 +17,24 @@ const GET_BEASISWA = gql`
 `;
 
 export default function BeasiswaPage() {
+  const [itemSearch, setItemSearch] = useState("");
+  const [searchParam] = useState(["nama"]);
   const { loading, error, data } = useQuery(GET_BEASISWA);
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
+  const searchBeasiswa = (items) => {
+    return items.filter((item) => {
+      return searchParam.some((newItem) => {
+        return (
+          item[newItem]
+            .toString()
+            .toLowerCase()
+            .indexOf(itemSearch.toLowerCase()) > -1
+        );
+      });
+    });
+  };
   return (
     <>
       <div className=" bg-blue-500  py-16">
@@ -37,14 +52,17 @@ export default function BeasiswaPage() {
       </div>
 
       <div className="max-w-[90rem] w-full mx-auto px-4">
-        <div className="my-5">
+        <div className="my-5 flex  justify-between items-center">
+          <h3 className="text-3xl font-bold">Semua Beasiswa</h3>
           <div className="relative flex rounded-md shadow-sm">
             <input
               type="text"
               id="hs-search-box-with-loading-5"
               name="hs-search-box-with-loading-5"
-              className="py-3 px-4 pl-11 block w-full border border-gray-300 shadow-sm rounded-l-md text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 "
+              className="py-3 px-4 pl-11 block w-full border border-gray-300 shadow-sm rounded-md text-md focus:z-10 focus:border-blue-500 focus:ring-blue-500 "
               placeholder="Input search"
+              value={itemSearch}
+              onChange={(e) => setItemSearch(e.target.value)}
             />
             <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
               <svg
@@ -58,16 +76,10 @@ export default function BeasiswaPage() {
                 <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
               </svg>
             </div>
-            <button
-              type="button"
-              className="py-3 px-4 inline-flex flex-shrink-0 justify-center items-center gap-2 rounded-r-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
-            >
-              Search
-            </button>
           </div>
         </div>
         <div className="grid grid-cols-1 gap-10 justify-center md:grid-cols-4 sm:grid-cols-2">
-          {data.beasiswa.map((item, index) => (
+          {searchBeasiswa(data.beasiswa).map((item, index) => (
             <Link
               key={item.id}
               to={`/beasiswa/${item.id}`}

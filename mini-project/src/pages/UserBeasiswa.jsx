@@ -1,6 +1,6 @@
 import { gql, useQuery, useSubscription } from "@apollo/client";
 import { Link } from "react-router-dom";
-import { user } from "../components/Atoms";
+import { authAtom } from "../components/Atoms";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 
@@ -28,8 +28,8 @@ const GET_BEASISWA = gql`
 // `;
 export default function UserBeasiswa() {
   const { loading, error, data } = useSubscription(GET_BEASISWA);
-  const [userx] = useAtom(user);
-
+  const [userx] = useAtom(authAtom);
+  console.log(userx.user);
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
   // useEffect(() => {
@@ -44,6 +44,8 @@ export default function UserBeasiswa() {
   //     setBeasiswaRekomendasi(filteredBeasiswa);
   //   }
   // }, [data, userx]);
+  // console.log(userx);
+
   return (
     <>
       <div>
@@ -54,17 +56,17 @@ export default function UserBeasiswa() {
           {data.beasiswa
             .filter((item) => {
               if (
-                (item.pendidikan === userx.pendidikan ||
+                (item.pendidikan === userx.user.pendidikan ||
                   item.pendidikan === "umum") &&
-                (item.domisili === userx.domisili || item.domisili === "semua")
+                (item.domisili === userx.user.domisili ||
+                  item.domisili === "semua")
               ) {
                 return item;
               }
             })
             .map((item) => (
-              <div>
+              <div key={item.id}>
                 <Link
-                  key={item.id}
                   to={`/beasiswa/${item.id}`}
                   state={{ data: item }}
                   className=""

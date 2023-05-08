@@ -2,9 +2,14 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { gql, useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
-import { useAtom } from "jotai";
-import { user } from "../components/Atoms";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { authAtom } from "../components/Atoms";
 import Swal from "sweetalert2";
+// import { AuthContext } from "../auth/AuthContext";
+// import { useContext } from "react";
+// import jwt_decode from "jwt-decode";
+import Cookies from "js-cookie";
+
 const GET_USERS = gql`
   query MyQuery {
     users {
@@ -13,6 +18,8 @@ const GET_USERS = gql`
       password
       domisili
       pendidikan
+      namaDepan
+      namaBelakang
     }
   }
 `;
@@ -24,23 +31,47 @@ const admin = {
 
 export default function LoginPage() {
   const { loading, error, data } = useQuery(GET_USERS);
-  const [userx, setUser] = useAtom(user);
+  // const [userx, setUser] = useAtom(user);
   const navigate = useNavigate();
-
+  // const [usersAtomx, setUsersAtomx] = useAtom(usersData);
+  const [authState, setAuthState] = useAtom(authAtom);
+  // console.log(authState);
+  // console.log(useContext(AuthContext));
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
+  function login(userx, tokenx) {
+    // set the token in cookies
+    Cookies.set("auth_token", tokenx, { expires: 1 });
+    // Cookies.set("dataUser", userx, { expires: 1 });
+    localStorage.setItem("userData", JSON.stringify(userx));
+    // decode the token to get the user data
+    // console.log(userx, tokenx);
+    // set the user state
+    setAuthState({ user: userx, token: tokenx });
+    // console.log(JSON.parse(localStorage.getItem("userData")));
+  }
   const onSubmit = (input) => {
     if (input.email == admin.email && input.password === admin.password) {
       alert("Berhasil masuk sebagai admin");
+      Cookies.set("auth_token", import.meta.env.VITE_ADMIN_COOK, {
+        expires: 1,
+      });
+      const adminData = { namaDepan: "admin", namaBelakang: "d" };
+      localStorage.setItem("userData", JSON.stringify(adminData));
+      setAuthState({ user: adminData, token: import.meta.env.VITE_ADMIN_COOK });
+
       navigate("/adminPage");
+      // setUser({ namaDepan: "Admin", namaBelakang: "D" });
     } else {
       const match = data.users.find((user) => {
         if (user.email === input.email && user.password === input.password) {
-          setUser(user);
+          // setUser(user);
+          // console.log(user);
+          login(user, user.id);
           return true;
         }
       });
@@ -60,10 +91,13 @@ export default function LoginPage() {
       }
     }
   };
-
+  if (authState.token !== undefined) {
+    return navigate("/");
+  }
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
+  // setUsersAtomx(data.users);
   return (
     <>
       <div className="flex items-center mx-auto  justify-center  gap-20 ">

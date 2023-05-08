@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { user } from "../components/Atoms";
+import { authAtom } from "../components/Atoms";
 import { useAtom } from "jotai";
 import { gql, useSubscription } from "@apollo/client";
 
@@ -17,7 +17,7 @@ const GET_USERS = gql`
 `;
 
 export default function UserSidebar() {
-  const [userIdx] = useAtom(user);
+  // const [userIdx] = useAtom(authAtom.user.user.id);
   // const { loading, error, data } = useSubscription(GET_USERS, {
   //   variables: { id: userIdx },
   // });

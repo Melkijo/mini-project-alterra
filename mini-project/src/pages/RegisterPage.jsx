@@ -2,8 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { gql, useMutation } from "@apollo/client";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { useAtom } from "jotai";
+import { authAtom } from "../components/Atoms";
 
 const INSERT_USER = gql`
   mutation MyMutation(
@@ -35,8 +37,8 @@ export default function RegisterPage() {
   const [insertUser] = useMutation(INSERT_USER);
   const navigate = useNavigate();
   const [provinces, setProvinces] = useState([]);
-
   const pendidikanList = ["umum", "smp", "sma/smk", "S1", "S2"];
+  const [authState, setAuthState] = useAtom(authAtom);
 
   const onSubmit = async (data) => {
     const { namaDepan, namaBelakang, email, password, domisili, pendidikan } =
@@ -76,7 +78,9 @@ export default function RegisterPage() {
 
       .catch((error) => console.error(error));
   }, []);
-
+  if (authState.token !== undefined) {
+    return navigate("/");
+  }
   return (
     <>
       <div className="flex items-center mx-auto  justify-center  gap-20 ">
