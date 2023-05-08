@@ -49,7 +49,7 @@ export default function LoginPage() {
     // Cookies.set("dataUser", userx, { expires: 1 });
     localStorage.setItem("userData", JSON.stringify(userx));
     // decode the token to get the user data
-    // console.log(userx, tokenx);
+
     // set the user state
     setAuthState({ user: userx, token: tokenx });
     // console.log(JSON.parse(localStorage.getItem("userData")));
