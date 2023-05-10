@@ -25,7 +25,7 @@ import AdminUsers from "./pages/AdminUsers.jsx";
 import AdminEditPage from "./pages/AdminEditPage.jsx";
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: "ws://evolved-akita-43.hasura.app/v1/graphql",
+    url: "wss://evolved-akita-43.hasura.app/v1/graphql",
     connectionParams: {
       headers: {
         "x-hasura-admin-secret": import.meta.env.VITE_HASURA_ADMIN_SECRET,
