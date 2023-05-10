@@ -4,6 +4,7 @@ import { gql, useMutation } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const UPDATE_USER = gql`
   mutation MyMutation(
@@ -80,7 +81,10 @@ export default function UserPage() {
     });
     if (result) {
       localStorage.setItem("userData", JSON.stringify(data));
-      alert("Akun berhasil Diperbaharui");
+      Swal.fire({
+        icon: "success",
+        title: `data berhasil diubah!`,
+      });
       setUser({ user: data, token: user.user.id });
       setEdit(false);
     }
