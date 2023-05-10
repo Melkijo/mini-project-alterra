@@ -3,11 +3,11 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
-    'node_modules/preline/dist/*.js',
+    './src/assets/preline/dist/*.js',
   ],
   theme: {
     extend: {},
   },
-  plugins: [require('preline/plugin')],
+  plugins: [require('./src/assets/preline/plugin')],
 }
 
