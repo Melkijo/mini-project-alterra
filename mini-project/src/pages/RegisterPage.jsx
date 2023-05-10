@@ -6,6 +6,7 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useAtom } from "jotai";
 import { authAtom } from "../components/Atoms";
+import Swal from "sweetalert2";
 
 const INSERT_USER = gql`
   mutation MyMutation(
@@ -55,7 +56,10 @@ export default function RegisterPage() {
       },
     });
     if (result) {
-      alert("Akun berhasil dibuat");
+      Swal.fire({
+        icon: "success",
+        title: "Akun Berhasil dibuat!!",
+      });
       navigate("/masuk");
     }
   };
@@ -91,7 +95,7 @@ export default function RegisterPage() {
             className=" h-screen  object-cover "
           />
         </div>
-        <div className="px-4 ">
+        <div className="">
           <Link to={"/"}>
             <h3 className="text-6xl font-bold ">
               BEASISWA<span className=" text-blue-500">KITA</span>
@@ -99,7 +103,7 @@ export default function RegisterPage() {
             <p className="text-3xl">Dari kita untuk kita</p>
           </Link>
 
-          <form onSubmit={handleSubmit(onSubmit)} className=" mt-16">
+          <form onSubmit={handleSubmit(onSubmit)} className=" pt-16">
             <h3 className="text-3xl font-bold mb-5">Daftar</h3>
 
             <div className="flex gap-7">
@@ -116,6 +120,7 @@ export default function RegisterPage() {
                   className="py-3 px-4 block w-full border border-gray-200 rounded-md text-medium focus:border-blue-500 focus:ring-blue-500  "
                   placeholder="nama depan"
                 />
+                {errors.namaDepan && <p>nama depan harus diisi</p>}
               </div>
               <div>
                 <label
@@ -129,7 +134,8 @@ export default function RegisterPage() {
                   {...register("namaBelakang", { required: true })}
                   className="py-3 px-4 block w-full border border-gray-200 rounded-md text-medium focus:border-blue-500 focus:ring-blue-500  "
                   placeholder="nama belakang"
-                />
+                />{" "}
+                {errors.namaBelakang && <p>nama belakang harus diisi</p>}
               </div>
             </div>
             <label className="block text-medium font-medium mb-2 mt-5 ">
@@ -162,6 +168,7 @@ export default function RegisterPage() {
                   {...register("domisili", { required: true })}
                   className="py-3 px-4 block w-full border border-gray-200 rounded-md text-medium focus:border-blue-500 focus:ring-blue-500 "
                 >
+                  <option value="">Pilih</option>
                   {provinces.provinsi &&
                     provinces.provinsi.map((item, index) => (
                       <option value={item.nama} key={index}>
@@ -169,6 +176,7 @@ export default function RegisterPage() {
                       </option>
                     ))}
                 </select>
+                {errors.domisili && <p>domisili harus diisi</p>}
               </div>
               <div>
                 <label
@@ -187,6 +195,7 @@ export default function RegisterPage() {
                     </option>
                   ))}
                 </select>
+                {errors.pendidikan && <p>email harus diisi</p>}
               </div>
             </div>
             <button
@@ -196,7 +205,7 @@ export default function RegisterPage() {
               Registrasi
             </button>
           </form>
-          <h5>
+          <h5 className="">
             Sudah punya akun?{" "}
             <Link to="/masuk" className="  text-blue-500">
               masuk

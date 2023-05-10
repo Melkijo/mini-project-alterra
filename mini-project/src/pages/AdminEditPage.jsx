@@ -10,6 +10,7 @@ import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
 import { storage } from "../components/Firebase";
 
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 const GET_BEASISWA = gql`
   query MyQuery($id: uuid!) {
     beasiswa_by_pk(id: $id) {
@@ -21,6 +22,7 @@ const GET_BEASISWA = gql`
       deadline_date
       id
       desc
+      link
     }
   }
 `;
@@ -35,6 +37,7 @@ const UPDATE_BEASISWA = gql`
     $deadline_date: date!
     $reg_date: date
     $pendidikan: String!
+    $link: String!
   ) {
     update_beasiswa_by_pk(
       pk_columns: { id: $id }
@@ -46,6 +49,7 @@ const UPDATE_BEASISWA = gql`
         deadline_date: $deadline_date
         reg_date: $reg_date
         pendidikan: $pendidikan
+        link: $link
       }
     ) {
       id
@@ -55,6 +59,7 @@ const UPDATE_BEASISWA = gql`
 
 export default function AdminEditPage() {
   const { id } = useParams();
+  const [tempImg, setTempImg] = useState("");
   const { loading, error, data } = useQuery(GET_BEASISWA, {
     variables: { id: id },
   });
@@ -70,16 +75,8 @@ export default function AdminEditPage() {
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  useForm({
-    defaultValues: async () => {
-      const tempData = await data;
-      return {
-        // id: tempData.beasiswa_by_pk.id,
-        nama: "tempData.beasiswa_by_pk.nama",
-        // domisili: tempData.beasiswa_by_pk.domisili,
-      };
-    },
-  });
+  useForm();
+
   let provincesApi = "https://dev.farizdotid.com/api/daerahindonesia/provinsi";
 
   useEffect(() => {
@@ -94,21 +91,29 @@ export default function AdminEditPage() {
       .catch((error) => console.error(error));
   }, []);
 
-  useEffect(() => {
-    register("desc", {});
-  }, [register]);
-
   const onDescChange = (e) => {
     setValue("desc", e);
   };
 
   const onSubmit = async (data) => {
-    const { id, nama, img, domisili, pendidikan, registrasi, deadline, desc } =
-      data;
-
-    const imageRef = ref(storage, `img/${img[0].name}`);
-    const snapshot = await uploadBytes(imageRef, img[0]);
-    const imgUrl = await getDownloadURL(snapshot.ref);
+    const {
+      id,
+      nama,
+      img,
+      domisili,
+      pendidikan,
+      registrasi,
+      deadline,
+      desc,
+      link,
+    } = data;
+    let imgUrl = tempImg;
+    if (img !== imgUrl) {
+      console.log("tes");
+      const imageRef = ref(storage, `img/${img[0].name}`);
+      const snapshot = await uploadBytes(imageRef, img[0]);
+      imgUrl = await getDownloadURL(snapshot.ref);
+    }
 
     const result = await updateBeasiswa({
       variables: {
@@ -120,28 +125,38 @@ export default function AdminEditPage() {
         desc,
         domisili,
         pendidikan,
+        link,
       },
     });
 
     if (result) {
-      alert("Beasiswa berhasil Diperbaharui");
+      Swal.fire({
+        icon: "success",
+        title: `Beasiswa berhasil diperbaharui!`,
+      });
+      navigate("/adminPage");
     } else {
       alert("gagal");
     }
   };
+  useEffect(() => {
+    register("desc");
+  }, [register, data]);
 
-  //   const { state } = useLocation();
+  useEffect(() => {
+    if (data) {
+      setTempImg(data.beasiswa_by_pk.img_url);
+    }
+  }, [data]);
   if (loading || loadingUpdate) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
-  //   tes = data{ variables: { id: "c6bc2537-80f7-4b4f-9f99-9e6aa1b09f07" } }
-  //   const { id } = useParams();
   const descContent = watch("desc", data.beasiswa_by_pk.desc);
 
   return (
     <>
       <div>
-        <div className="  mx-80  my-10 ">
+        <div className="   mx-60  my-10 ">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex justify-between">
               <h1 className="text-3xl font-bold mb-5">Edit Beasiswa</h1>
@@ -149,7 +164,7 @@ export default function AdminEditPage() {
                 <Link>
                   <button
                     type="button"
-                    class="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                    className="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
                     onClick={() => navigate(-1)}
                   >
                     Batal
@@ -158,7 +173,7 @@ export default function AdminEditPage() {
 
                 <button
                   type="submit"
-                  class="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-yellow-500 text-white hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                  className="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-yellow-500 text-white hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
                 >
                   Update
                 </button>
@@ -241,7 +256,8 @@ export default function AdminEditPage() {
                     ))}
                 </select>
               </div>
-
+            </div>
+            <div className="flex gap-5 mt-5">
               <div>
                 <label className="block text-medium font-medium mb-2 ">
                   Registrasi
@@ -269,7 +285,22 @@ export default function AdminEditPage() {
                   })}
                 />
               </div>
+              <div className="w-full mr-5">
+                <label
+                  htmlFor="input-label"
+                  className="block text-medium font-medium mb-2 "
+                >
+                  Link
+                </label>
+
+                <input
+                  className=" py-3 px-4 block w-full border border-gray-200 rounded-md text-medium focus:border-blue-500 focus:ring-blue-500 "
+                  type="text"
+                  {...register("link", { value: data.beasiswa_by_pk.link })}
+                />
+              </div>
             </div>
+
             <div>
               <label
                 htmlFor="input-label"

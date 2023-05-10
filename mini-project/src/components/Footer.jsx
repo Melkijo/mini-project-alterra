@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <>
       <hr />
-      <div className="flex justify-start sm:justify-between w-full max-w-[90rem] mx-auto px-4 flex-col  my-5 gap-10 sm:flex-row">
+      <div className="flex justify-start sm:justify-between w-full max-w-[90rem] mx-auto px-4 flex-col  mb-7 mt-10 gap-10 sm:flex-row">
         <div>
           <h3 className="text-3xl font-bold ">
             BEASISWA<span className=" text-blue-500">KITA</span>
@@ -33,11 +33,26 @@ export default function Footer() {
       </div>
       <div className=" bg-gray-800 py-5">
         <div className="max-w-[90rem] mx-auto px-4 flex  justify-between">
-          <p className="text-white">&copy; 2023 Copyright by mejodev</p>
+          <p className="text-white">
+            &copy; 2023 Copyright by{" "}
+            <a
+              href="https://personal-web-one-delta.vercel.app/"
+              target="_blank"
+              className="font-bold"
+            >
+              mejodev
+            </a>
+          </p>
           <div className="flex items-center gap-10">
-            <i className="fa-brands fa-instagram fa-xl  text-white"></i>
-            <i className="fa-brands fa-tiktok fa-xl text-white"></i>
-            <i className="fa-brands fa-twitter fa-xl text-white"></i>
+            <a href="https://www.instagram.com/melkijo/" target="_blank">
+              <i className="fa-brands fa-instagram fa-xl  text-white"></i>
+            </a>
+            <a href="https://www.behance.net/jonathanandaraa" target="_blank">
+              <i className="fa-brands fa-behance fa-xl text-white"></i>
+            </a>
+            <a href="https://dribbble.com/melkijo" target="_blank">
+              <i className="fa-brands fa-dribbble fa-xl text-white"></i>
+            </a>
           </div>
         </div>
       </div>

@@ -2,6 +2,8 @@ import { gql, useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
 import { useState } from "react";
+import Pagination from "../components/Pagination";
+import BeasiswaCard from "../components/BeasiswaCard";
 
 const GET_BEASISWA = gql`
   query GET_BEASISWA {
@@ -17,6 +19,9 @@ const GET_BEASISWA = gql`
 `;
 
 export default function BeasiswaPage() {
+  const [currentPage, setCurentPage] = useState(1);
+  const [postPerPage, setPostPerPage] = useState(8);
+
   const [itemSearch, setItemSearch] = useState("");
   const [searchParam] = useState(["nama"]);
   const { loading, error, data } = useQuery(GET_BEASISWA);
@@ -35,6 +40,9 @@ export default function BeasiswaPage() {
       });
     });
   };
+  const lastPostIndex = currentPage * postPerPage;
+  const firstPostIndex = lastPostIndex - postPerPage;
+
   return (
     <>
       <div className=" bg-blue-500  py-16">
@@ -79,74 +87,27 @@ export default function BeasiswaPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 gap-10 justify-center md:grid-cols-4 sm:grid-cols-2">
-          {searchBeasiswa(data.beasiswa).map((item, index) => (
-            <Link
-              key={item.id}
-              to={`/beasiswa/${item.id}`}
-              state={{ data: item }}
-              className=" w-full md:w-80"
-            >
-              <div className=" bg-white border shadow-md rounded-xl   ">
-                <img
-                  className=" h-auto   rounded-t-xl md:h-64 object-cover"
-                  src={item.img_url}
-                  alt="Image Description"
-                />
-                <div className="p-4 md:p-5">
-                  <h3 className="text-lg font-bold text-gray-800 ">
-                    {item.nama}
-                  </h3>
-                  <div>
-                    <div className="flex items-center  justify-between">
-                      <p>Registrasi</p>
-                      <p className=" ">{item.reg_date}</p>
-                    </div>
-                    <div className="flex items-center  justify-between">
-                      <p>Tutup</p>
-                      <p className=" ">{item.deadline_date}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
+          {searchBeasiswa(data.beasiswa)
+            .slice(firstPostIndex, lastPostIndex)
+            .map((item, index) => (
+              <Link
+                key={item.id}
+                to={`/beasiswa/${item.id}`}
+                state={{ data: item }}
+                className=" w-full md:w-80"
+              >
+                <BeasiswaCard item={item} />
+              </Link>
+            ))}
         </div>
       </div>
-      <nav className="flex justify-center items-center space-x-2 mb-5">
-        <a
-          className="text-gray-500 hover:text-blue-600 p-4 inline-flex items-center gap-2 rounded-md"
-          href="#"
-        >
-          <span aria-hidden="true">«</span>
-          <span className="sr-only">Previous</span>
-        </a>
-        <a
-          className="w-10 h-10 bg-blue-500 text-white p-4 inline-flex items-center text-sm font-medium rounded-full"
-          href="#"
-          aria-current="page"
-        >
-          1
-        </a>
-        <a
-          className="w-10 h-10 text-gray-500 hover:text-blue-600 p-4 inline-flex items-center text-sm font-medium rounded-full"
-          href="#"
-        >
-          2
-        </a>
-        <a
-          className="w-10 h-10 text-gray-500 hover:text-blue-600 p-4 inline-flex items-center text-sm font-medium rounded-full"
-          href="#"
-        >
-          3
-        </a>
-        <a
-          className="text-gray-500 hover:text-blue-600 p-4 inline-flex items-center gap-2 rounded-md"
-          href="#"
-        >
-          <span className="sr-only">Next</span>
-          <span aria-hidden="true">»</span>
-        </a>
-      </nav>
+      <div className="flex justify-center">
+        <Pagination
+          totalPosts={data.beasiswa.length}
+          postPerPage={postPerPage}
+          setCurrentPage={setCurentPage}
+        />
+      </div>
     </>
   );
 }

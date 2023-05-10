@@ -1,20 +1,9 @@
-import { gql, useSubscription, useMutation } from "@apollo/client";
+import { gql, useSubscription, useMutation, useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 import emailjs from "@emailjs/browser";
-const GET_BEASISWA = gql`
-  subscription MySubscription {
-    beasiswa {
-      id
-      nama
-      img_url
-      domisili
-      desc
-      deadline_date
-      reg_date
-      pendidikan
-    }
-  }
-`;
+import { useRef, useState } from "react";
+import Swal from "sweetalert2";
+import Pagination from "../components/Pagination";
 
 const DELETE_BEASISWA = gql`
   mutation MyMutation($id: uuid!) {
@@ -24,35 +13,75 @@ const DELETE_BEASISWA = gql`
   }
 `;
 
-const GET_USERS = gql`
-  subscription MySubscription {
+const GET_BEASISWA = gql`
+  query MyQuery {
+    beasiswa {
+      deadline_date
+      desc
+      domisili
+      id
+      img_url
+      nama
+      pendidikan
+      reg_date
+      link
+    }
     users {
       id
-      namaDepan
-      namaBelakang
       email
       domisili
       pendidikan
+      namaDepan
     }
   }
 `;
 
 export default function AdminBeasiswa() {
-  const { loading, error, data } = useSubscription(GET_BEASISWA);
-  const [deleteBeasiswa, { loading: loadingDelete }] =
-    useMutation(DELETE_BEASISWA);
+  const { loading, error, data } = useQuery(GET_BEASISWA);
+  const [deleteBeasiswa, { loading: loadingDelete }] = useMutation(
+    DELETE_BEASISWA,
+    {
+      refetchQueries: [GET_BEASISWA],
+    }
+  );
+  const [currentPage, setCurentPage] = useState(1);
+  const [postPerPage, setPostPerPage] = useState(6);
 
+  const lastPostIndex = currentPage * postPerPage;
+  const firstPostIndex = lastPostIndex - postPerPage;
+
+  const [show, setShow] = useState(false);
+  const [selectedData, setSelectedData] = useState({});
   const handleDeleteBeasiswa = (idx) => {
-    deleteBeasiswa({
-      variables: {
-        id: idx,
-      },
+    Swal.fire({
+      title: "Apakah kamu yakin?",
+      text: "Data beasiswa tidak bisa dikembalikan lagi!!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, Hapus!",
+      cancelButtonText: "Batal",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteBeasiswa({
+          variables: {
+            id: idx,
+          },
+        });
+        Swal.fire("Terhapus!", "Data Beasiswa terhapus.", "success");
+      }
     });
   };
 
-  const handleSendBeasiswa = (e) => {
-    e.preventDefault();
+  const form = useRef();
 
+  if (loading || loadingDelete) return "Loading...";
+  if (error) return `Error! ${error.message}`;
+
+  const sendEmail = (e) => {
+    e.preventDefault();
+    console.log(form.current);
     emailjs
       .sendForm(
         "service_t6gq2hu",
@@ -69,8 +98,101 @@ export default function AdminBeasiswa() {
         }
       );
   };
-  if (loading || loadingDelete) return "Loading...";
-  if (error) return `Error! ${error.message}`;
+
+  const handleClick = (selectedRec) => {
+    setSelectedData(selectedRec);
+    setShow(true);
+  };
+
+  const hideModal = () => {
+    setShow(false);
+  };
+  const Modal = ({ handleClose, details }) => {
+    return (
+      <>
+        <div className="fixed top-0 left-0, w-full h-full   bg-opacity-50 bg-gray-500">
+          <div className=" fixed  w-1/5 h-auto -translate-x-2/4 -translate-y-2/4 left-2/4 top-2/4 bg-white">
+            <form ref={form} onSubmit={sendEmail}>
+              <div className="p-4 overflow-y-auto flex flex-col items-start">
+                {data.users
+                  .filter((user) => {
+                    return (
+                      (details.pendidikan === user.pendidikan ||
+                        details.pendidikan === "umum") &&
+                      (details.domisili === user.domisili ||
+                        details.domisili === "semua")
+                    );
+                  })
+                  .map((user, index) => (
+                    <div key={index}>
+                      <input
+                        type="text"
+                        name="to_email"
+                        id="to_email"
+                        className=" hidden"
+                        value={user.email}
+                        readOnly
+                      />
+                    </div>
+                  ))}
+                <input
+                  type="text"
+                  name="link"
+                  id="link"
+                  className=" hidden"
+                  value={details.link}
+                  readOnly
+                />
+                <label
+                  htmlFor="input-label"
+                  className="block text-sm font-medium mb-2 "
+                >
+                  Nama beasiswa
+                </label>
+                <input
+                  type="text"
+                  name="nama_beasiswa"
+                  id="nama_beasiswa"
+                  value={details.nama}
+                  readOnly
+                  className="py-3 px-4 block w-full border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 "
+                />
+              </div>
+              <div className="p-4 overflow-y-auto flex flex-col items-start">
+                <label
+                  htmlFor="input-label"
+                  className="block text-sm font-medium mb-2 "
+                >
+                  Pesan
+                </label>
+                <textarea
+                  className="py-3 px-4 block w-full border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="pesan"
+                  name="message"
+                  id="message"
+                />
+              </div>
+              <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t ">
+                <button
+                  type="button"
+                  className="hs-dropdown-toggle py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm  "
+                  onClick={handleClose}
+                >
+                  batal
+                </button>
+                <button
+                  type="submit"
+                  className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm"
+                >
+                  Bagikan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </>
+    );
+  };
   return (
     <>
       <div className="mt-10 px-10">
@@ -115,12 +237,7 @@ export default function AdminBeasiswa() {
               >
                 Deadline
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-1/4"
-              >
-                deskripsi
-              </th>
+
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
@@ -131,13 +248,13 @@ export default function AdminBeasiswa() {
           </thead>
           <tbody className="divide-y divide-gray-200 ">
             {data.beasiswa &&
-              data.beasiswa.map((item) => (
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">
+              data.beasiswa.slice(firstPostIndex, lastPostIndex).map((item) => (
+                <tr key={item.id}>
+                  <td className="  w-full h-[100px]  p-2whitespace-nowrap text-sm font-medium text-gray-800 ">
                     <img
                       src={item.img_url}
                       alt=""
-                      className="  w-[120px] h-auto"
+                      className=" w-full h-full object-cover"
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800  overflow-x-auto">
@@ -155,11 +272,9 @@ export default function AdminBeasiswa() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto">
                     <p>{item.deadline_date}</p>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto ">
-                    {item.desc}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="grid grid-cols-2 gap-5">
+
+                  <td className=" py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="grid grid-cols-2 gap-3">
                       <Link
                         to={`/adminPage/edit/${item.id}`}
                         state={{ data: item }}
@@ -167,7 +282,7 @@ export default function AdminBeasiswa() {
                       >
                         <button
                           type="button"
-                          className="py-2 px-2 inline-flex justify-center items-center gap-2 rounded-md border border-transparent  font-normal  text-xs bg-yellow-500 text-white hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all "
+                          className="w-full py-2 px-2 inline-flex justify-center items-center gap-2 rounded-md border border-transparent  font-normal  text-xs bg-yellow-500 text-white hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all "
                         >
                           Edit
                         </button>
@@ -183,23 +298,31 @@ export default function AdminBeasiswa() {
                       <Link
                         to={`/beasiswa/${item.id}`}
                         state={{ data: item }}
-                        className="text-blue-500"
+                        className="text-blue-500 items-center flex justify-center"
                       >
                         View
                       </Link>
-                      <div
-                        className="text-blue-500 cursor-pointer"
-                        onClick={() => handleSendBeasiswa()}
+                      <button
+                        className="py-2 px-2 inline-flex justify-center items-center gap-2 rounded-md border border-transparent  font-normal   text-xs bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all "
+                        onClick={() => handleClick(item)}
                       >
                         Bagikan
-                      </div>
+                      </button>
                     </div>
                   </td>
                 </tr>
               ))}
           </tbody>
         </table>
+        <div className="flex justify-center ">
+          <Pagination
+            totalPosts={data.beasiswa.length}
+            postPerPage={postPerPage}
+            setCurrentPage={setCurentPage}
+          />
+        </div>
       </div>
+      {show && <Modal details={selectedData} handleClose={hideModal} />}
     </>
   );
 }

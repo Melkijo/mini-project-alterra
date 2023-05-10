@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-// import { textAtom } from "../components/Atoms";
-// import { useAtom } from "jotai";
 import { gql, useQuery } from "@apollo/client";
+import { useAtom } from "jotai";
+import { authAtom } from "../components/Atoms";
+import BeasiswaCard from "../components/BeasiswaCard";
 
 const GET_BEASISWA = gql`
   query GET_BEASISWA {
@@ -16,7 +17,8 @@ const GET_BEASISWA = gql`
   }
 `;
 export default function LandingPage() {
-  // const [userName] = useAtom(textAtom);
+  const [user] = useAtom(authAtom);
+
   const caraKerja = [
     {
       title: "Registrasi Akun",
@@ -35,29 +37,33 @@ export default function LandingPage() {
     },
   ];
   const { loading, error, data } = useQuery(GET_BEASISWA);
+
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
   return (
-    // <div className="max-w-[90rem] w-full mx-auto px-4">
     <div>
-      <div className="flex flex-col-reverse items-center my-14 max-w-[90rem] mx-auto px-4   sm:flex-row ">
+      <div className="flex flex-col-reverse items-center  my-14 max-w-[90rem] mx-auto px-4   sm:flex-row ">
         <div>
-          <h1 className="text-6xl font-bold mb-7 leading-snug">
-            Peluang Beasiswa Terbaik untuk Masa Depan Gemilang!
-          </h1>
-          <p className=" w-full mb-5 text-justify sm:w-3/4">
+          <p className="text-6xl font-bold mb-7 leading-snug text-gray-800">
+            Peluang <span className="text-blue-500"> Beasiswa</span> Terbaik
+            untuk Masa Depan Gemilang!
+          </p>
+          <p className=" w-full mb-5 text-justify sm:w-3/4 font-medium text-gray-500">
             Jangan Biarkan Biaya Pendidikan Menghalangi Mimpimu untuk Meraih
             Masa Depan Gemilang, Temukan Berbagai Informasi Beasiswa Terlengkap
             dan Akurat Hanya di Sini!"
           </p>
-          <Link to={"/daftar"}>
-            <button
-              type="button"
-              className="mr-5 py-3 px-5 inline-flex justify-center items-center  rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm"
-            >
-              Daftar
-            </button>
-          </Link>
+          {!user.user ? (
+            <Link to={"/daftar"}>
+              <button
+                type="button"
+                className="mr-5 py-3 px-5 inline-flex justify-center items-center  rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm"
+              >
+                Daftar
+              </button>
+            </Link>
+          ) : null}
+
           <a href="#kerja">
             <button
               type="button"
@@ -67,32 +73,52 @@ export default function LandingPage() {
               <i className="fa-solid fa-arrow-right"></i>
             </button>
           </a>
+
+          <div className="flex text-center mt-7 gap-9">
+            <div>
+              <h3 className="  font-bold  text-2xl">50+</h3>
+              <small className=" text-sm  font-medium text-gray-400">
+                Total beasiswa
+              </small>
+            </div>
+            <div>
+              <h3 className="  font-bold  text-2xl">29+</h3>
+              <small className=" text-sm  font-medium text-gray-400">
+                Total mitra
+              </small>
+            </div>
+            <div>
+              <h3 className="  font-bold  text-2xl">99+</h3>
+              <small className=" text-sm  font-medium text-gray-400">
+                Total pengguna
+              </small>
+            </div>
+          </div>
         </div>
-        <div className="w-full mx-2">
+        <div className="w-full">
           <img
             src="https://firebasestorage.googleapis.com/v0/b/beasiswakita-3e322.appspot.com/o/Thesis-amico%201.svg?alt=media&token=33c10c00-7d26-4d75-8ec6-a0d4acba81f0"
-            alt=""
-            className="w-full"
+            alt="hero-img"
           />
         </div>
       </div>
 
-      <div className=" my-14">
-        <h3 className="text-3xl font-bold text-center mb-5 ">
+      <div className=" pt-14  pb-20 bg-blue-50">
+        <h3 className="text-4xl font-bold text-center mb-9 text-gray-800 ">
           Cara Kerja Kami
         </h3>
 
         <div
           id="kerja"
-          className="flex gap-10 flex-wrap justify-center text-center "
+          className="flex gap-10 flex-wrap justify-center text-center text-gray-800 "
         >
           {caraKerja.map((item, index) => (
             <div
               key={index}
-              className="flex  border shadow-lg rounded-md  w-96 "
+              className="flex  border shadow-lg rounded-md  w-96   bg-white"
             >
-              <div className="p-4 md:p-7">
-                <img src={item.img} className=" w-32 mx-auto mb-5" alt="" />
+              <div className="p-14">
+                <img src={item.img} className="  w-36 mx-auto mb-5" alt="" />
                 <h3 className="text-lg font-bold text-gray-800 ">
                   {item.title}
                 </h3>
@@ -103,51 +129,61 @@ export default function LandingPage() {
         </div>
       </div>
 
-      <div className="flex-col max-w-[90rem] mx-auto px-4 gap-10  my-24 flex   items-center  rounded-md sm:flex-row">
-        <img
-          src="https://firebasestorage.googleapis.com/v0/b/beasiswakita-3e322.appspot.com/o/utama%2Fimage%205.jpg?alt=media&token=30187456-4cee-458d-8af9-ee1d23073297"
-          alt=""
-          className="w-full"
-        />
-        <div>
-          <h3 className="text-3xl font-bold mb-5">Misi Kami</h3>
-          <p className="text-justify w-full sm:w-11/12">
+      <div className=" max-w-[90rem] mx-auto px-8  py-8 gap-10  mb-24 mt-20  grid grid-cols-1 md:grid-cols-2 items-center rounded-md shadow-xl bg-blue-500">
+        <div className="flex justify-center">
+          <img
+            src="https://firebasestorage.googleapis.com/v0/b/beasiswakita-3e322.appspot.com/o/utama%2Ftentang-img.png?alt=media&token=42e64130-7e0e-4afc-8601-4822594e0534"
+            alt=""
+            className="w-[600px] rounded-md"
+          />
+        </div>
+
+        <div className="text-white">
+          <h3 className="text-4xl font-bold mb-5">Misi Kami</h3>
+          <p className=" w-full sm:w-11/12 line-clamp-6">
             Kami adalah sebuah start up yang berfokus pada penyediaan informasi
             beasiswa untuk masyarakat Indonesia. Berawal dari kesadaran akan
             banyaknya anak-anak muda yang sulit mendapatkan akses ke pendidikan
             berkualitas karena faktor finansial, kami berkomitmen untuk menjadi
             solusi terdepan dalam memberikan informasi beasiswa yang akurat,
-            terpercaya, dan mudah diakses.
+            terpercaya, dan mudah diakses. dan juga kami dari beasiswakita ingin
+            memberikan rekomendasi beasiswa kepada para pengguna kami
           </p>
+          <Link to={"/tentang"}>
+            <div className=" gap-5 items-center py-3 inline-flex border border-transparent font-semibold focus:outline-none focus:ring-2 ring-offset-white focus:ring-blue-500 focus:ring-offset-2 transition-all ">
+              lebih lengkap
+              <i className="fa-solid fa-arrow-right"></i>
+            </div>
+          </Link>
         </div>
       </div>
 
       <div className="my-16 max-w-[90rem] mx-auto px-4">
-        <h3 className="text-3xl font-bold mb-7 text-center">
+        <h3 className="text-4xl font-bold mb-9 text-center ">
           Informasi Beasiswa Terbaru
         </h3>
-        <div className="flex  gap-20 mb-5  items-center justify-center flex-col sm:flex-row">
-          {data.beasiswa.slice(0, 3).map((item, index) => (
+        <div className=" mb-7 mx- 28 grid grid-cols-1 gap-10 justify-center md:grid-cols-4 sm:grid-cols-2">
+          {data.beasiswa.slice(0, 4).map((item) => (
             <Link
               key={item.id}
               to={`/beasiswa/${item.id}`}
               state={{ data: item }}
               className=" w-full md:w-80"
             >
-              <div className=" bg-white border shadow-md rounded-xl   ">
+              {/* <div className=" bg-white border shadow-md rounded-xl   ">
                 <img
                   className=" h-auto   rounded-t-xl md:h-64 object-cover"
                   src={item.img_url}
                   alt="Image Description"
                 />
                 <div className="p-4 md:p-5">
-                  <h3 className="text-lg font-bold text-gray-800 ">
+                  <h3 className="text-lg font-bold text-gray-800 mb-3">
                     {item.nama}
                   </h3>
-                  <div>
+                  <div className=" bg-gray-100 p-3 flex flex-col gap-1 rounded-md">
                     <div className="flex items-center  justify-between">
                       <p>Registrasi</p>
-                      <p className=" ">{item.reg_date}</p>
+                      <p className=" font-medium">{item.reg_date}</p>
                     </div>
                     <div className="flex items-center  justify-between">
                       <p>Tutup</p>
@@ -155,7 +191,8 @@ export default function LandingPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
+              <BeasiswaCard item={item} />
             </Link>
           ))}
         </div>

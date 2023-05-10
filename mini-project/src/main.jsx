@@ -92,7 +92,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: "/userPage",
+    path: "/userPage/",
     element: <User />,
     children: [
       {
@@ -139,11 +139,15 @@ const router = createBrowserRouter([
     element: <BeasiswaDetail />,
     errorElement: <ErrorPage />,
   },
+  {
+    path: "*",
+    element: <ErrorPage />,
+  },
 ]);
 ReactDOM.createRoot(document.getElementById("root")).render(
   <ApolloProvider client={client}>
-    <React.StrictMode>
-      <RouterProvider router={router} />
-    </React.StrictMode>
+    {/* <React.StrictMode> */}
+    <RouterProvider router={router} />
+    {/* </React.StrictMode> */}
   </ApolloProvider>
 );

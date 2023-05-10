@@ -7,6 +7,8 @@ import { storage } from "../components/Firebase";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 const GET_BEASISWA = gql`
   subscription MySubscription {
     beasiswa {
@@ -27,6 +29,7 @@ const INSERT_BEASISWA = gql`
     $desc: String!
     $domisili: String!
     $pendidikan: String!
+    $link: String!
   ) {
     insert_beasiswa(
       objects: {
@@ -37,6 +40,7 @@ const INSERT_BEASISWA = gql`
         desc: $desc
         domisili: $domisili
         pendidikan: $pendidikan
+        link: $link
       }
     ) {
       returning {
@@ -63,7 +67,7 @@ export default function AdminUpload() {
   const [updateBeasiswa] = useMutation(UPDATE_BEASISWA);
   const [provinces, setProvinces] = useState([]);
   const pendidikanList = ["umum", "smp", "sma/smk", "S1", "S2"];
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -95,8 +99,16 @@ export default function AdminUpload() {
   };
 
   const onSubmit = async (data) => {
-    const { nama, img, domisili, pendidikan, registrasi, deadline, desc } =
-      data;
+    const {
+      nama,
+      img,
+      domisili,
+      pendidikan,
+      registrasi,
+      deadline,
+      desc,
+      link,
+    } = data;
     const result = await insertBeasiswa({
       variables: {
         nama,
@@ -106,6 +118,7 @@ export default function AdminUpload() {
         desc,
         domisili,
         pendidikan,
+        link,
       },
     });
 
@@ -122,7 +135,11 @@ export default function AdminUpload() {
     });
 
     if (result) {
-      alert("Beasiswa berhasil ditambah");
+      Swal.fire({
+        icon: "success",
+        title: `Beasiswa berhasil ditambah!`,
+      });
+      navigate("/adminPage");
     } else {
       alert("gagal");
     }
@@ -152,7 +169,7 @@ export default function AdminUpload() {
                 className="py-3 px-4 block w-full border border-gray-200 rounded-md text-medium focus:border-blue-500 focus:ring-blue-500  "
                 placeholder="nama beasiswa"
               />
-              {errors.nama && <p>harus diisi</p>}
+
               <label
                 htmlFor="input-label"
                 className="block text-medium font-medium mb-2 mt-5"
@@ -234,6 +251,21 @@ export default function AdminUpload() {
                   />
                 </div>
               </div>
+              <div>
+                <label
+                  htmlFor="input-label"
+                  className="block text-medium font-medium mb-2 mt-5 "
+                >
+                  Link
+                </label>
+                <input
+                  type="text"
+                  id="input-label"
+                  {...register("link", { required: true })}
+                  className="py-3 px-4 block w-full border border-gray-200 rounded-md text-medium focus:border-blue-500 focus:ring-blue-500  "
+                  placeholder="Link beasiswa"
+                />
+              </div>
             </div>
             <div>
               <label
@@ -245,7 +277,7 @@ export default function AdminUpload() {
               <ReactQuill
                 value={descContent}
                 onChange={onDescChange}
-                className="w-[750px] h-[300px]"
+                className="w-[750px] h-[410px]"
               />
             </div>
           </div>

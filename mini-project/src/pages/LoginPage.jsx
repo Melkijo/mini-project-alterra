@@ -1,17 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useSubscription } from "@apollo/client";
 import { Link } from "react-router-dom";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { authAtom } from "../components/Atoms";
 import Swal from "sweetalert2";
-// import { AuthContext } from "../auth/AuthContext";
-// import { useContext } from "react";
-// import jwt_decode from "jwt-decode";
 import Cookies from "js-cookie";
 
 const GET_USERS = gql`
-  query MyQuery {
+  subscription MyQuery {
     users {
       id
       email
@@ -24,19 +21,10 @@ const GET_USERS = gql`
   }
 `;
 
-const admin = {
-  email: "admin@gmail.com",
-  password: "admin",
-};
-
 export default function LoginPage() {
-  const { loading, error, data } = useQuery(GET_USERS);
-  // const [userx, setUser] = useAtom(user);
+  const { loading, error, data } = useSubscription(GET_USERS);
   const navigate = useNavigate();
-  // const [usersAtomx, setUsersAtomx] = useAtom(usersData);
   const [authState, setAuthState] = useAtom(authAtom);
-  // console.log(authState);
-  // console.log(useContext(AuthContext));
   const {
     register,
     handleSubmit,
@@ -46,15 +34,20 @@ export default function LoginPage() {
   function login(userx, tokenx) {
     // set the token in cookies
     Cookies.set("auth_token", tokenx, { expires: 1 });
-    // Cookies.set("dataUser", userx, { expires: 1 });
     localStorage.setItem("userData", JSON.stringify(userx));
 
     // set the user state
     setAuthState({ user: userx, token: tokenx });
   }
   const onSubmit = (input) => {
-    if (input.email == admin.email && input.password === admin.password) {
-      alert("Berhasil masuk sebagai admin");
+    if (
+      input.email == import.meta.env.VITE_ADMIN_EMAIL &&
+      input.password === import.meta.env.VITE_ADMIN_PASS
+    ) {
+      Swal.fire({
+        icon: "success",
+        title: `Selamat Datang Admin`,
+      });
       Cookies.set("auth_token", import.meta.env.VITE_ADMIN_COOK, {
         expires: 1,
       });
@@ -63,12 +56,9 @@ export default function LoginPage() {
       setAuthState({ user: adminData, token: import.meta.env.VITE_ADMIN_COOK });
 
       navigate("/adminPage");
-      // setUser({ namaDepan: "Admin", namaBelakang: "D" });
     } else {
       const match = data.users.find((user) => {
         if (user.email === input.email && user.password === input.password) {
-          // setUser(user);
-          // console.log(user);
           login(user, user.id);
           return true;
         }
@@ -80,7 +70,7 @@ export default function LoginPage() {
           title: `Selamat Datang`,
         });
 
-        navigate("/userPage");
+        navigate("/userPage/");
       } else {
         Swal.fire({
           icon: "error",

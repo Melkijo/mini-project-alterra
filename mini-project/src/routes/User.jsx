@@ -1,4 +1,3 @@
-import { Outlet } from "react-router-dom";
 import UserSidebar from "../components/UserSidebar";
 import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
@@ -14,9 +13,8 @@ export default function User() {
   }
   return (
     <>
-      <div className="flex">
+      <div>
         <UserSidebar />
-        <Outlet />
       </div>
     </>
   );
