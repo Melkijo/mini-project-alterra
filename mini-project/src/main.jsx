@@ -23,6 +23,7 @@ import AdminBeasiswa from "./pages/AdminBeasiswa.jsx";
 import AdminUpload from "./pages/AdminUpload.jsx";
 import AdminUsers from "./pages/AdminUsers.jsx";
 import AdminEditPage from "./pages/AdminEditPage.jsx";
+import("preline");
 const wsLink = new GraphQLWsLink(
   createClient({
     url: "wss://evolved-akita-43.hasura.app/v1/graphql",
