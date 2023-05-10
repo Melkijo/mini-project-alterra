@@ -1,4 +1,4 @@
-import { gql, useSubscription, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 import emailjs from "@emailjs/browser";
 import { useRef, useState } from "react";
