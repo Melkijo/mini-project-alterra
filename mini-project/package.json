@@ -19,6 +19,7 @@
     "graphql-ws": "^5.12.1",
     "jotai": "^2.0.4",
     "js-cookie": "^3.0.5",
+    "moment": "^2.29.4",
     "preline": "^1.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

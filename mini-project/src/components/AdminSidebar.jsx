@@ -22,7 +22,7 @@ export default function UserSidebar() {
   };
   return (
     <>
-      <header className="drop-shadow-xl flex flex-wrap sm:justify-start sm:flex-nowrap z-50 w-full bg-white text-sm py-4 ">
+      <header className="drop-shadow-xl flex flex-wrap sm:justify-start sm:flex-nowrap z-50 w-full bg-white text-sm py-4  ">
         <nav
           className=" w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between"
           aria-label="Global"

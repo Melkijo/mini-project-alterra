@@ -114,9 +114,10 @@ const router = createBrowserRouter([
   {
     path: "/adminPage",
     element: <Admin />,
+    errorElement: <ErrorPage />,
     children: [
       {
-        errorElement: <ErrorPage />,
+        // errorElement: <ErrorPage />,
         children: [
           { index: true, element: <AdminBeasiswa /> },
           {

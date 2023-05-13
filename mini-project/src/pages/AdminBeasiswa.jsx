@@ -4,7 +4,7 @@ import emailjs from "@emailjs/browser";
 import { useRef, useState } from "react";
 import Swal from "sweetalert2";
 import Pagination from "../components/Pagination";
-
+import Moment from "moment";
 const DELETE_BEASISWA = gql`
   mutation MyMutation($id: uuid!) {
     delete_beasiswa_by_pk(id: $id) {
@@ -75,6 +75,22 @@ export default function AdminBeasiswa() {
   };
 
   const form = useRef();
+
+  function getNumberOfDays(end) {
+    const date1 = new Date();
+    const date2 = new Date(end);
+
+    // One day in milliseconds
+    const oneDay = 1000 * 60 * 60 * 24;
+
+    // Calculating the time difference between two dates
+    const diffInTime = date2.getTime() - date1.getTime();
+
+    // Calculating the no. of days between two dates
+    const diffInDays = Math.round(diffInTime / oneDay);
+
+    return diffInDays;
+  }
 
   if (loading || loadingDelete) return "Loading...";
   if (error) return `Error! ${error.message}`;
@@ -231,11 +247,23 @@ export default function AdminBeasiswa() {
               >
                 registrasi
               </th>
+
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                className="hs-tooltip px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
               >
-                Deadline
+                <div className=" hs-tooltip-toggle  ">
+                  Deadline (&#63;)
+                  <span
+                    className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm dark:bg-slate-700"
+                    role="tooltip"
+                  >
+                    <span className=" text-yellow-400">Kuning</span> : Kurang
+                    dari 7 Hari <br />
+                    <span className=" text-red-400">Merah</span> : sudah lewat
+                    deadline <br />
+                  </span>
+                </div>
               </th>
 
               <th
@@ -249,7 +277,14 @@ export default function AdminBeasiswa() {
           <tbody className="divide-y divide-gray-200 ">
             {data.beasiswa &&
               data.beasiswa.slice(firstPostIndex, lastPostIndex).map((item) => (
-                <tr key={item.id}>
+                <tr
+                  key={item.id}
+                  className={
+                    getNumberOfDays(item.deadline_date) < 0
+                      ? "bg-gray-200"
+                      : "bg-white"
+                  }
+                >
                   <td className="  w-full h-[100px]  p-2whitespace-nowrap text-sm font-medium text-gray-800 ">
                     <img
                       src={item.img_url}
@@ -267,10 +302,22 @@ export default function AdminBeasiswa() {
                     <p>{item.pendidikan}</p>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto">
-                    <p>{item.reg_date}</p>
+                    <p>{Moment(item.reg_date).format("MMM Do YY")}</p>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto">
-                    <p>{item.deadline_date}</p>
+                    {getNumberOfDays(item.deadline_date) < 7 ? (
+                      getNumberOfDays(item.deadline_date) < 0 ? (
+                        <p className=" text-red-400 font-bold">
+                          {Moment(item.deadline_date).format("MMM Do YY")}
+                        </p>
+                      ) : (
+                        <p className="text-yellow-400 font-bold">
+                          {Moment(item.deadline_date).format("MMM Do YY")}
+                        </p>
+                      )
+                    ) : (
+                      <p>{Moment(item.deadline_date).format("MMM Do YY")}</p>
+                    )}
                   </td>
 
                   <td className=" py-4 whitespace-nowrap text-right text-sm font-medium">

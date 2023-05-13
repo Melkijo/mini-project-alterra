@@ -3,8 +3,7 @@ const Pagination = ({ totalPosts, postPerPage, setCurrentPage }) => {
   for (let i = 1; i <= Math.ceil(totalPosts / postPerPage); i++) {
     pages.push(i);
   }
-  console.log(pages);
-  console.log(Math.ceil(totalPosts / postPerPage));
+
   return (
     <div>
       {pages.map((page, index) => {
