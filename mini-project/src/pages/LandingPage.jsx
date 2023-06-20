@@ -49,7 +49,7 @@ export default function LandingPage() {
                   Terbaik untuk Masa Depan Gemilang!
                </p>
                <p className=" w-full mb-5 text-justify sm:w-3/4 font-medium text-gray-500">
-                  Jangan Biarkan Biaya Pendidikan Menghalangi Mimpimu untuk
+                  Jangn Biarkan Biaya Pendidikan Menghalangi Mimpimu untuk
                   Meraih Masa Depan Gemilang, Temukan Berbagai Informasi
                   Beasiswa Terlengkap dan Akurat Hanya di Sini!"
                </p>
