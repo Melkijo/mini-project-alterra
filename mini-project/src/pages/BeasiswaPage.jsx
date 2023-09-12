@@ -119,7 +119,7 @@ export default function BeasiswaPage() {
                   ))}
             </div>
          </div>
-         <div className="flex justify-center">
+         <div className="flex justify-center mt-5">
             <Pagination
                totalPosts={data.beasiswa.length}
                postPerPage={postPerPage}

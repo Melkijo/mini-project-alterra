@@ -15,7 +15,7 @@ const DELETE_BEASISWA = gql`
 
 const GET_BEASISWA = gql`
    query MyQuery {
-      beasiswa {
+      beasiswa(order_by: { created_at: desc }) {
          deadline_date
          desc
          domisili
@@ -45,7 +45,7 @@ export default function AdminBeasiswa() {
       }
    );
    const [currentPage, setCurentPage] = useState(1);
-   const [postPerPage, setPostPerPage] = useState(6);
+   const [postPerPage, setPostPerPage] = useState(4);
 
    const lastPostIndex = currentPage * postPerPage;
    const firstPostIndex = lastPostIndex - postPerPage;
@@ -107,6 +107,8 @@ export default function AdminBeasiswa() {
          )
          .then(
             (result) => {
+               Swal.fire("Berhasil!", "Email berhasil dikirim.", "success");
+               setShow(false);
                console.log(result.text);
             },
             (error) => {
@@ -212,7 +214,7 @@ export default function AdminBeasiswa() {
    return (
       <>
          <div className="mt-10 px-10">
-            <h1 className="text-5xl font-bold mb-5">List Beasiswa</h1>
+            <h1 className="text-3xl font-bold mb-5">List Beasiswa</h1>
 
             <table className="w-full table-fixed  divide-y divide-gray-200 ">
                <thead>
@@ -275,108 +277,105 @@ export default function AdminBeasiswa() {
                   </tr>
                </thead>
                <tbody className="divide-y divide-gray-200 ">
-                  {data.beasiswa &&
-                     data.beasiswa
-                        .slice(firstPostIndex, lastPostIndex)
-                        .map((item) => (
-                           <tr
-                              key={item.id}
-                              className={
-                                 getNumberOfDays(item.deadline_date) < 0
-                                    ? "bg-gray-200"
-                                    : "bg-white"
-                              }
-                           >
-                              <td className="  w-full h-[100px]  p-2whitespace-nowrap text-sm font-medium text-gray-800 ">
-                                 <img
-                                    src={item.img_url}
-                                    alt=""
-                                    className=" w-full h-full object-cover"
-                                 />
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800  overflow-x-auto">
-                                 <p>{item.nama}</p>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto">
-                                 <p>{item.domisili}</p>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto">
-                                 <p>{item.pendidikan}</p>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto">
-                                 <p>
-                                    {Moment(item.reg_date).format("MMM Do YY")}
-                                 </p>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto">
-                                 {getNumberOfDays(item.deadline_date) < 7 ? (
-                                    getNumberOfDays(item.deadline_date) < 0 ? (
-                                       <p className=" text-red-400 font-bold">
-                                          {Moment(item.deadline_date).format(
-                                             "MMM Do YY"
-                                          )}
-                                       </p>
-                                    ) : (
-                                       <p className="text-yellow-400 font-bold">
-                                          {Moment(item.deadline_date).format(
-                                             "MMM Do YY"
-                                          )}
-                                       </p>
-                                    )
-                                 ) : (
-                                    <p>
+                  {data.beasiswa
+                     ?.slice(firstPostIndex, lastPostIndex)
+                     .map((item) => (
+                        <tr
+                           key={item.id}
+                           className={
+                              getNumberOfDays(item.deadline_date) < 0
+                                 ? "bg-gray-200"
+                                 : "bg-white"
+                           }
+                        >
+                           <td className="  w-full h-[100px]  p-2whitespace-nowrap text-sm font-medium text-gray-800 ">
+                              <img
+                                 src={item.img_url}
+                                 alt=""
+                                 className=" w-full h-full object-cover"
+                              />
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800  overflow-x-auto">
+                              <p>{item.nama}</p>
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto">
+                              <p>{item.domisili}</p>
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto">
+                              <p>{item.pendidikan}</p>
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto">
+                              <p>{Moment(item.reg_date).format("MMM Do YY")}</p>
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 overflow-x-auto">
+                              {getNumberOfDays(item.deadline_date) < 7 ? (
+                                 getNumberOfDays(item.deadline_date) < 0 ? (
+                                    <p className=" text-red-400 font-bold">
                                        {Moment(item.deadline_date).format(
                                           "MMM Do YY"
                                        )}
                                     </p>
-                                 )}
-                              </td>
+                                 ) : (
+                                    <p className="text-yellow-400 font-bold">
+                                       {Moment(item.deadline_date).format(
+                                          "MMM Do YY"
+                                       )}
+                                    </p>
+                                 )
+                              ) : (
+                                 <p>
+                                    {Moment(item.deadline_date).format(
+                                       "MMM Do YY"
+                                    )}
+                                 </p>
+                              )}
+                           </td>
 
-                              <td className=" py-4 whitespace-nowrap text-right text-sm font-medium">
-                                 <div className="grid grid-cols-2 gap-3">
-                                    <Link
-                                       to={`/adminPage/edit/${item.id}`}
-                                       state={{ data: item }}
-                                       className="text-blue-500"
-                                    >
-                                       <button
-                                          type="button"
-                                          className="w-full py-2 px-2 inline-flex justify-center items-center gap-2 rounded-md border border-transparent  font-normal  text-xs bg-yellow-500 text-white hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all "
-                                       >
-                                          Edit
-                                       </button>
-                                    </Link>
-
+                           <td className=" py-4 whitespace-nowrap text-right text-sm font-medium">
+                              <div className="grid grid-cols-2 gap-3">
+                                 <Link
+                                    to={`/adminPage/edit/${item.id}`}
+                                    state={{ data: item }}
+                                    className="text-blue-500"
+                                 >
                                     <button
                                        type="button"
-                                       className="py-2 px-2 inline-flex justify-center items-center gap-2 rounded-md border border-transparent  font-normal   text-xs bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all "
-                                       onClick={() =>
-                                          handleDeleteBeasiswa(item.id)
-                                       }
+                                       className="w-full py-2 px-2 inline-flex justify-center items-center gap-2 rounded-md border border-transparent  font-normal  text-xs bg-yellow-500 text-white hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all "
                                     >
-                                       Delete
+                                       Edit
                                     </button>
-                                    <Link
-                                       to={`/beasiswa/${item.id}`}
-                                       state={{ data: item }}
-                                       className="text-blue-500 items-center flex justify-center"
-                                    >
-                                       View
-                                    </Link>
-                                    <button
-                                       className="py-2 px-2 inline-flex justify-center items-center gap-2 rounded-md border border-transparent  font-normal   text-xs bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all "
-                                       onClick={() => handleClick(item)}
-                                       disabled
-                                    >
-                                       Bagikan
-                                    </button>
-                                 </div>
-                              </td>
-                           </tr>
-                        ))}
+                                 </Link>
+
+                                 <button
+                                    type="button"
+                                    className="py-2 px-2 inline-flex justify-center items-center gap-2 rounded-md border border-transparent  font-normal   text-xs bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all "
+                                    onClick={() =>
+                                       handleDeleteBeasiswa(item.id)
+                                    }
+                                 >
+                                    Delete
+                                 </button>
+                                 <Link
+                                    to={`/beasiswa/${item.id}`}
+                                    state={{ data: item }}
+                                    className="text-blue-500 items-center flex justify-center"
+                                 >
+                                    View
+                                 </Link>
+                                 <button
+                                    className="py-2 px-2 inline-flex justify-center items-center gap-2 rounded-md border border-transparent  font-normal   text-xs bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all "
+                                    onClick={() => handleClick(item)}
+                                    //    disabled
+                                 >
+                                    Bagikan
+                                 </button>
+                              </div>
+                           </td>
+                        </tr>
+                     ))}
                </tbody>
             </table>
-            <div className="flex justify-center ">
+            <div className="flex justify-end ">
                <Pagination
                   totalPosts={data.beasiswa.length}
                   postPerPage={postPerPage}
